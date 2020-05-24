@@ -1,0 +1,12 @@
+# C
+*.o
+
+# Python
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.idea
