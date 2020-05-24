@@ -3,7 +3,7 @@
 The following C program is designed to test different image compression algorithms and libraries on sample bitmap images.
 A python utility program is included to easily extract the image data and convert to raw bytes.
 
-#Python utility
+# Python utility
 Matplotlib is required to run. This utility is set up to run from the command line, taking an image file name as an argument. The image must be 8-bit greyscale bitmap only. The raw bytes will be extracted and written to the file bytes/imageName.bytes. This file will be used by the C program.
 
 # C program
