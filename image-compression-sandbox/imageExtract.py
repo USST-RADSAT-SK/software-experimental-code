@@ -20,6 +20,9 @@ if not os.path.isfile('images/'+args.file):
 #read img bytes into 2-d array
 arr = plt.imread('images/'+args.file)
 
+plt.imshow(arr)
+plt.show()
+
 #access pixel using [row,col] indexing
 # indexing [0, :] would be entire first row
 

@@ -7,6 +7,8 @@
 
 // https://code.google.com/archive/p/lzfx/ lzfx library from google project
 #include "../inc/lzfx.h"
+#include "../inc/lzfP.h"
+#include "../inc/lzf.h"
 
 int main(int argc, char **argv) {
 
@@ -63,6 +65,29 @@ int main(int argc, char **argv) {
       printf("Compression resulted in larger output file\n");
     }
   }
+
+  // http://software.schmorp.de/pkg/liblzf.html
+  printf("\nTrying lib lzf library now\n");
+  char* out2;
+  outSize = fileLen*2;
+  unsigned int rc2;
+  out2= (char*)malloc(outSize * sizeof(char));
+  rc2 = lzf_compress(buffer, fileLen, out2, outSize);
+
+  if (rc2 == 0){
+    fprintf(stderr, "lib lzf compression failed: buffer not modified.\n");
+  }
+  else{
+    printf("Compression was successful\n");
+    float compressionRatio = (float)fileLen / (float)rc2;
+    printf("Output size is %u bytes\n", rc2);
+    printf("Compression ratio: %f\n", compressionRatio);
+    if(rc2 > fileLen) {
+      printf("Compression resulted in larger output file\n");
+    }
+  }
+
+
 
   return 0;
 }
