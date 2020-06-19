@@ -9,6 +9,8 @@
 #include "../inc/lzfx.h"
 //lz4
 #include "../inc/lz4.h"
+//zLib
+#include "../inc/zlib.h"
 
 int main(int argc, char **argv) {
 
@@ -41,13 +43,17 @@ int main(int argc, char **argv) {
   // now the images bytes are contained in a 1d array 'buffer' (aligned as row1, row2, row3, etc)
   int rc;
   int lz4OutSize;
+  int zLibErr;
   char *outBuf_lzfx;
   char *outBuf_lz4;
+  char *outBuf_zLib;
   unsigned int outSize = fileLen*2;
+  unsigned long zLibOutSize = fileLen * 2;
   // we need the output (compressed) buffer to be larger just in case
   outBuf_lzfx = (char*)malloc(outSize * sizeof(char));
   outBuf_lz4 = (char*)malloc(outSize * sizeof(char));
-  if (!outBuf_lzfx || !outBuf_lz4) {
+  outBuf_zLib = (char*)malloc(zLibOutSize * sizeof(char));
+  if (!outBuf_lzfx || !outBuf_lz4 || !outBuf_zLib) {
     fprintf(stderr, "Failed to malloc for output buffer\n");
     exit(EXIT_FAILURE);
   }
@@ -89,6 +95,26 @@ int main(int argc, char **argv) {
 
     if (lz4OutSize > fileLen) {
       printf("lz4 compression resulted in larger output file\n");
+    }
+  }
+
+  //zLib compressionRatio
+  printf("===============\nzLib Compression\n===============\n");
+
+  zLibErr = compress((Bytef*)outBuf_zLib, &zLibOutSize, (Bytef*)buffer, fileLen);
+
+  if (zLibErr != Z_OK) {
+    //compression Failed
+    printf("zLib compression failed\n");
+  }
+  else {
+    printf("zLib compression was successful\n");
+    float zLibCompressionRatio = (float)fileLen / (float)zLibOutSize;
+    printf("zLib output size is %lu bytes\n", zLibOutSize);
+    printf("zLib compression ratio: %f\n", zLibCompressionRatio);
+
+    if (zLibOutSize > fileLen) {
+      printf("zLib compression resulted in larger output file\n");
     }
   }
 
