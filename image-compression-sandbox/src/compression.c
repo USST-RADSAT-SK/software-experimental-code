@@ -7,8 +7,13 @@
 
 // https://code.google.com/archive/p/lzfx/ lzfx library from google project
 #include "../inc/lzfx.h"
+//lz4
+#include "../inc/lz4.h"
+//zLib
+#include "../inc/zlib.h"
 #include "../inc/lzfP.h"
 #include "../inc/lzf.h"
+
 
 int main(int argc, char **argv) {
 
@@ -40,32 +45,81 @@ int main(int argc, char **argv) {
   printf("File is %u bytes\n", fileLen);
   // now the images bytes are contained in a 1d array 'buffer' (aligned as row1, row2, row3, etc)
   int rc;
-  char *outBuf;
+  int lz4OutSize;
+  int zLibErr;
+  char *outBuf_lzfx;
+  char *outBuf_lz4;
+  char *outBuf_zLib;
   unsigned int outSize = fileLen*2;
+  unsigned long zLibOutSize = fileLen * 2;
   // we need the output (compressed) buffer to be larger just in case
-  outBuf = (char*)malloc(outSize * sizeof(char));
-  if (!outBuf) {
+  outBuf_lzfx = (char*)malloc(outSize * sizeof(char));
+  outBuf_lz4 = (char*)malloc(outSize * sizeof(char));
+  outBuf_zLib = (char*)malloc(zLibOutSize * sizeof(char));
+  if (!outBuf_lzfx || !outBuf_lz4 || !outBuf_zLib) {
     fprintf(stderr, "Failed to malloc for output buffer\n");
     exit(EXIT_FAILURE);
   }
-  rc = lzfx_compress(buffer, fileLen, outBuf, &outSize);
+  //lzfx compression
+  rc = lzfx_compress(buffer, fileLen, outBuf_lzfx, &outSize);
+
+  printf("===============\nlzfx Compression\n===============\n");
 
   if (rc < 0) {
     // compression failed
     fprintf(stderr, "lzfx compression failed: buffer not modified. Error code %d\n", rc);
   }
   else {
-    printf("Compression was successful\n");
+    printf("lzfx compression was successful\n");
     //ratio = uncompressed / Compressed
     float compressionRatio = (float)fileLen / (float)outSize;
-    printf("Output size is %u bytes\n", outSize);
-    printf("Compression ratio: %f\n", compressionRatio);
+    printf("lzfx output size is %u bytes\n", outSize);
+    printf("lzfx compression ratio: %f\n", compressionRatio);
 
     if(outSize > fileLen) {
-      printf("Compression resulted in larger output file\n");
+      printf("lzfx compression resulted in larger output file\n");
     }
   }
 
+  //lz4 compression
+  lz4OutSize = LZ4_compress_default(buffer, outBuf_lz4, fileLen, outSize);
+
+  printf("===============\nlz4 Compression\n===============\n");
+
+  if (lz4OutSize < 1) {
+    //compression Failed
+    printf("lz4 compression failed\n");
+  }
+  else {
+    printf("lz4 compression was successful\n");
+    float lz4CompressionRatio = (float)fileLen / (float)lz4OutSize;
+    printf("lz4 output size is %u bytes\n", lz4OutSize);
+    printf("lz4 compression ratio: %f\n", lz4CompressionRatio);
+
+    if (lz4OutSize > fileLen) {
+      printf("lz4 compression resulted in larger output file\n");
+    }
+  }
+
+  //zLib compressionRatio
+  printf("===============\nzLib Compression\n===============\n");
+
+  zLibErr = compress((Bytef*)outBuf_zLib, &zLibOutSize, (Bytef*)buffer, fileLen);
+
+  if (zLibErr != Z_OK) {
+    //compression Failed
+    printf("zLib compression failed\n");
+  }
+  else {
+    printf("zLib compression was successful\n");
+    float zLibCompressionRatio = (float)fileLen / (float)zLibOutSize;
+    printf("zLib output size is %lu bytes\n", zLibOutSize);
+    printf("zLib compression ratio: %f\n", zLibCompressionRatio);
+
+    if (zLibOutSize > fileLen) {
+      printf("zLib compression resulted in larger output file\n");
+    }
+  }
   // http://software.schmorp.de/pkg/liblzf.html
   printf("\nTrying lib lzf library now\n");
   char* out2;
@@ -86,8 +140,6 @@ int main(int argc, char **argv) {
       printf("Compression resulted in larger output file\n");
     }
   }
-
-
 
   return 0;
 }
