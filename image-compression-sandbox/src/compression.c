@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
   fread(buffer, fileLen, 1, fp); // Read in the entire file into buffer
   fclose(fp); // Close the file
 
-  printf("File is %u bytes\n", fileLen);
+  printf("Original file size is %u bytes\n", fileLen);
   // now the images bytes are contained in a 1d array 'buffer' (aligned as row1, row2, row3, etc)
   int rc;
   int lz4OutSize;
@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
     }
   }
   // http://software.schmorp.de/pkg/liblzf.html
-  printf("\nTrying lib lzf library now\n");
+  printf("===============\nlib lzf Compression\n===============\n");
   char* out2;
   outSize = fileLen*2;
   unsigned int rc2;
@@ -132,10 +132,10 @@ int main(int argc, char **argv) {
     fprintf(stderr, "lib lzf compression failed: buffer not modified.\n");
   }
   else{
-    printf("Compression was successful\n");
+    printf("lib lzf compression was successful\n");
     float compressionRatio = (float)fileLen / (float)rc2;
-    printf("Output size is %u bytes\n", rc2);
-    printf("Compression ratio: %f\n", compressionRatio);
+    printf("lib lzf output size is %u bytes\n", rc2);
+    printf("lib lzf compression ratio: %f\n", compressionRatio);
     if(rc2 > fileLen) {
       printf("Compression resulted in larger output file\n");
     }
