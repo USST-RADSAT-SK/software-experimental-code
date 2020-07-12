@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 
 #include "../inc/compression.h"
 
@@ -33,6 +34,8 @@ int main(int argc, char **argv) {
   FILE *fp;
   char *buffer;
   unsigned int fileLen;
+  clock_t start, end;
+  double cpu_time_used;
 
   fp = fopen(argv[1], "rb");  // Open as read in binary mode
   fseek(fp, 0, SEEK_END);     // seek pointer to EOF
@@ -61,7 +64,10 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
   //lzfx compression
+  start = clock();
   rc = lzfx_compress(buffer, fileLen, outBuf_lzfx, &outSize);
+  end = clock();
+  cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
   printf("===============\nlzfx Compression\n===============\n");
 
@@ -75,6 +81,7 @@ int main(int argc, char **argv) {
     float compressionRatio = (float)fileLen / (float)outSize;
     printf("lzfx output size is %u bytes\n", outSize);
     printf("lzfx compression ratio: %f\n", compressionRatio);
+    printf("lzfx cpu time used: %lf seconds\n", cpu_time_used);
 
     if(outSize > fileLen) {
       printf("lzfx compression resulted in larger output file\n");
