@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   char *buffer;
   unsigned int fileLen;
   clock_t start, end;
-  double cpu_time_used;
+  double cpu_time_used_lzfx, cpu_time_used_lz4, cpu_time_used_zLib, cpu_time_used_libLZF;
 
   fp = fopen(argv[1], "rb");  // Open as read in binary mode
   fseek(fp, 0, SEEK_END);     // seek pointer to EOF
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
   start = clock();
   rc = lzfx_compress(buffer, fileLen, outBuf_lzfx, &outSize);
   end = clock();
-  cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+  cpu_time_used_lzfx = ((double) (end - start)) / CLOCKS_PER_SEC;
 
   printf("===============\nlzfx Compression\n===============\n");
 
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     float compressionRatio = (float)fileLen / (float)outSize;
     printf("lzfx output size is %u bytes\n", outSize);
     printf("lzfx compression ratio: %f\n", compressionRatio);
-    printf("lzfx cpu time used: %lf seconds\n", cpu_time_used);
+    printf("lzfx cpu time used: %lf seconds\n", cpu_time_used_lzfx);
 
     if(outSize > fileLen) {
       printf("lzfx compression resulted in larger output file\n");
@@ -89,7 +89,10 @@ int main(int argc, char **argv) {
   }
 
   //lz4 compression
+  start = clock();
   lz4OutSize = LZ4_compress_default(buffer, outBuf_lz4, fileLen, outSize);
+  end = clock();
+  cpu_time_used_lz4 = ((double) (end - start)) / CLOCKS_PER_SEC;
 
   printf("===============\nlz4 Compression\n===============\n");
 
@@ -102,6 +105,7 @@ int main(int argc, char **argv) {
     float lz4CompressionRatio = (float)fileLen / (float)lz4OutSize;
     printf("lz4 output size is %u bytes\n", lz4OutSize);
     printf("lz4 compression ratio: %f\n", lz4CompressionRatio);
+    printf("lz4 cpu time used: %lf\n", cpu_time_used_lz4);
 
     if (lz4OutSize > fileLen) {
       printf("lz4 compression resulted in larger output file\n");
@@ -111,7 +115,10 @@ int main(int argc, char **argv) {
   //zLib compressionRatio
   printf("===============\nzLib Compression\n===============\n");
 
+  start = clock();
   zLibErr = compress((Bytef*)outBuf_zLib, &zLibOutSize, (Bytef*)buffer, fileLen);
+  end = clock();
+  cpu_time_used_zLib = ((double) (end - start)) / CLOCKS_PER_SEC;
 
   if (zLibErr != Z_OK) {
     //compression Failed
@@ -122,6 +129,7 @@ int main(int argc, char **argv) {
     float zLibCompressionRatio = (float)fileLen / (float)zLibOutSize;
     printf("zLib output size is %lu bytes\n", zLibOutSize);
     printf("zLib compression ratio: %f\n", zLibCompressionRatio);
+    printf("zLib cpu time used: %lf\n", cpu_time_used_zLib);
 
     if (zLibOutSize > fileLen) {
       printf("zLib compression resulted in larger output file\n");
@@ -133,7 +141,11 @@ int main(int argc, char **argv) {
   outSize = fileLen*2;
   unsigned int rc2;
   out2= (char*)malloc(outSize * sizeof(char));
+
+  start = clock();
   rc2 = lzf_compress(buffer, fileLen, out2, outSize);
+  end = clock();
+  cpu_time_used_libLZF = ((double) (end - start)) / CLOCKS_PER_SEC;
 
   if (rc2 == 0){
     fprintf(stderr, "lib lzf compression failed: buffer not modified.\n");
@@ -143,6 +155,7 @@ int main(int argc, char **argv) {
     float compressionRatio = (float)fileLen / (float)rc2;
     printf("lib lzf output size is %u bytes\n", rc2);
     printf("lib lzf compression ratio: %f\n", compressionRatio);
+    printf("lib lzf cpu time used: %lf\n", cpu_time_used_libLZF);
     if(rc2 > fileLen) {
       printf("Compression resulted in larger output file\n");
     }
