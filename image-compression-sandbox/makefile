@@ -8,8 +8,8 @@ default: all
 all: Compress
 
 
-Compress: compression.o lzfx.o lz4.o compress.o deflate.o crc32.o adler32.o trees.o zutil.o lzf_c.o lzf_d.o
-	$(CC) -o compress compression.o lzfx.o lz4.o compress.o deflate.o crc32.o adler32.o trees.o zutil.o lzf_c.o lzf_d.o
+Compress: compression.o lzfx.o lz4.o compress.o deflate.o crc32.o adler32.o trees.o zutil.o lzf_c.o lzf_d.o rice.o
+	$(CC) -o compress compression.o lzfx.o lz4.o compress.o deflate.o crc32.o adler32.o trees.o zutil.o lzf_c.o lzf_d.o rice.o
 
 compression.o: src/compression.c inc/compression.h
 		$(CC) $(CFLAGS) -c src/compression.c
@@ -45,6 +45,8 @@ lzf_c.o: src/lzf_c.c inc/lzfP.h
 lzf_d.o: src/lzf_d.c inc/lzfP.h
 	$(CC) -c src/lzf_d.c
 
+rice.o: src/rice.c inc/rice.h
+	$(CC) -c src/rice.c
 
 .PHONY: clean
 

@@ -14,6 +14,7 @@
 #include "../inc/zlib.h"
 #include "../inc/lzfP.h"
 #include "../inc/lzf.h"
+#include "../inc/rice.h"
 
 
 int main(int argc, char **argv) {
@@ -157,6 +158,30 @@ int main(int argc, char **argv) {
     printf("lib lzf compression ratio: %f\n", compressionRatio);
     printf("lib lzf cpu time used: %lf\n", cpu_time_used_libLZF);
     if(rc2 > fileLen) {
+      printf("Compression resulted in larger output file\n");
+    }
+  }
+
+  printf("===============\nRice Compression\n===============\n");
+  char* riceOutBuf;
+  outSize = fileLen * 2;
+  int riceSize;
+  riceOutBuf = (char*)malloc(outSize * sizeof(char));
+
+  start = clock();
+  riceSize = Rice_Compress(buffer, riceOutBuf, fileLen, RICE_FMT_UINT8);
+  end = clock();
+  double cpu_time_used_rice = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+  if(riceSize <= 0) {
+    printf("Rice compression failed.\n");
+  } else {
+    printf("Rice compression was successful.\n");
+    float compressionRatio = (float)fileLen / (float)riceSize;
+    printf("Rice output size is %d bytes\n", riceSize);
+    printf("Rice compression ratio: %f\n", compressionRatio);
+    printf("Rice cpu time used: %lf\n", cpu_time_used_rice);
+    if(riceSize > fileLen) {
       printf("Compression resulted in larger output file\n");
     }
   }
