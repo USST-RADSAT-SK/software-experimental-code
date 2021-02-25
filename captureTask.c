@@ -14,16 +14,33 @@
 * @return None
 */
 
+//An Error that may come up, Telecommands ID were assumed to be in hex already (i.e. 21 is 0x21)
+
 queue.h
-//Sending Telecommands: 0x1F,0x7F,.....,0x1F,0xFF
+//Telecommand Structure: 0x1F7F21(3rd bit in byte No)(Bottom[1] or Top Half[0])(SRAM 1[0] or SRAM 2[1])(Camera 1[0] or Camera 2[1])1FFF;
+int SRAM1Top = 0;
+int SRAM1Bottom = 0;
+int SRAM2Bottom = 0;
 
-
+void captureLocation(void *SRAMSlot){
+    //Send Capture command 
+    xQueueSend(QueueHandle_t xQueueCubeSense, (void*)&captureSRAM10, (TickType_t) 0);
+    //Send request for telemetry for successful image capture
+    xQueueSend(QueueHandle_t xQueueCubeSense, (void*)&resultSRAM10, (TickType_t) 15);
+    //Saves successful image capture telemetry to 
+    if( xQueueCubeSense != NULL){
+        if(xQueueRecieve(QueueHandle_t xQueueCubeSense, &(RxMessage), (TickType_t) 10) == pdPASSS){
+            //RxMessage now holds the most recent item in the queue 
+        }
+            
+    }
+}
 
 void captureTask(void *superresolution ){
     long captureSRAM10 = 0x1F7F210001FFF; // Telecommand 21, camera 1, SRAM 1, Top Half
-    long captureSRAM11 = 0x1F7F210011FFF; // Telecommand 21, camera 1, SRAM 1, bottom Half
-    //SRAM 2 Top half is reserved for ADCS
-    long captureSRAM21 = 0x1F7F210111FFF; // Telecommand 21, camera 1, SRAM 2, Bottom Half
+    long captureSRAM11 = 0x1F7F211001FFF; // Telecommand 21, camera 1, SRAM 1, bottom Half
+    // long captureSRAM11 = 0x1F7F210101FFF; // Telecommand 21, camera 1, SRAM 2, Top Half Reserved for ADCS
+    long captureSRAM21 = 0x1F7F211101FFF; // Telecommand 21, camera 1, SRAM 2, Bottom Half
     long resultSRAM10 = 0x1F7F210F0FF; // telemetry, camera,  
     int resultsCubeSense;
 
@@ -43,22 +60,29 @@ void captureTask(void *superresolution ){
 
         }
         else{
-            //Send Capture command 
-            xQueueSend(QueueHandle_t xQueueCubeSense, (void*)&captureSRAM10, (TickType_t) 0);
-            //Send request for telemetry for successful image capture
-            xQueueSend(QueueHandle_t xQueueCubeSense, (void*)&resultSRAM10, (TickType_t) 15);
-            //Saves successful image capture telemetry to 
-            if( xQueueCubeSense != NULL){
-                if(xQueueRecieve(QueueHandle_t xQueueCubeSense, &(RxMessage), (TickType_t) 10) == pdPASSS){
-                    //RxMessage now holds the most recent item in the queue 
-                }
-                   
-            }
 
-            //will have to loop for each case either way
-            
+            if(SRAM1Top){
+                captureLocation(long *captureSRAM10)
+            }
+            else if(SRAM1Bottom){
+                captureLocation(long *captureSRAM11)
+            }
+            else if(SRAM2Bottom){
+                captureLocation(long *captureSRAM21)
+            }
+            else{
+                //take no photos as all SRAM Slots are considered as good photos
+            }            
         }
     }
 }
 
+//-------------Useful Notes--------------
+
+
 //https://www.freertos.org/a00118.html
+
+
+// if current way of doing regular loop doesnt work try this if statement way
+// if (~flag1 || ~flag2 || ~flag3){
+//}
