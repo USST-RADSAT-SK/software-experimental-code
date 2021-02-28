@@ -47,6 +47,8 @@ void variant(unsigned char *image_buffer, long fileLen){
 
     variance = sum_x_minus_xbar /(fileLen-1);
 
+    //if variance between range
+    //  its good
     printf("Variance: %f\n", variance);
     printf("S.D: %f\n", sqrt(variance));
     printf("File length is: %d", fileLen);
@@ -87,3 +89,5 @@ Extracts data from file into array. Displays final results. */
 
 }
 
+// 50 Bad light argument files --> average variance ---> low end of the accepted range
+// 50 Bad dark argument files --> average variance ---> high end of the accepted range
