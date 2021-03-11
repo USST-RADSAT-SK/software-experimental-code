@@ -16,35 +16,45 @@
 
 //An Error that may come up, Telecommands ID were assumed to be in hex already (i.e. 21 is 0x21)
 
-queue.h
-//Telecommand Structure: 0x1F7F21(3rd bit in byte No)(Bottom[1] or Top Half[0])(SRAM 1[0] or SRAM 2[1])(Camera 1[0] or Camera 2[1])1FFF;
-int SRAM1Top = 0;
-int SRAM1Bottom = 0;
-int SRAM2Bottom = 0;
+queue.h;
+int SRAM1Top = 0;       //flag to check if SRAM slot is open
+int SRAM1Bottom = 0;    //flag to check if SRAM slot is open
+int SRAM2Bottom = 0;    //flag to check if SRAM slot is open
+
 
 void captureLocation(void *SRAMSlot){
+    long TLcapatureStatus = 0x1F7F941FFF; // telemetry 20, sensor 1,  
+    int resultsCubeSense;
+
+    struct AMessage{
+        char RxMessage
+    }
+
     //Send Capture command 
-    xQueueSend(QueueHandle_t xQueueCubeSense, (void*)&captureSRAM10, (TickType_t) 0);
+    xQueueSend(QueueHandle_t xQueueCubeSense, void *SRAMSlot, (TickType_t) 0);
     //Send request for telemetry for successful image capture
-    xQueueSend(QueueHandle_t xQueueCubeSense, (void*)&resultSRAM10, (TickType_t) 15);
+    xQueueSend(QueueHandle_t xQueueCubeSense, (void*)&TLcapatureStatus, (TickType_t) 15);
     //Saves successful image capture telemetry to 
     if( xQueueCubeSense != NULL){
-        if(xQueueRecieve(QueueHandle_t xQueueCubeSense, &(RxMessage), (TickType_t) 10) == pdPASSS){
-            //RxMessage now holds the most recent item in the queue 
+        xQueueRecieve(QueueHandle_t xQueueCubeSense, void *(RxMessage), (TickType_t) 10); 
+        resultsCubeSense = RxMessage & 0x000000001; //mask with byte 4 for status
+    }
+    int breakFlag;
+    while(resultsCubeSense != 0x2 | resultsCubeSense != 0x3 | breakFlag = 0){ //does not equal successful capture 
+            breakFlag = 0;
+        if (resultsCubeSense == 0x4){
+            breakFlag = 1;
         }
-            
     }
 }
 
 void captureTask(void *superresolution ){
-    long captureSRAM10 = 0x1F7F210001FFF; // Telecommand 21, camera 1, SRAM 1, Top Half
-    long captureSRAM11 = 0x1F7F211001FFF; // Telecommand 21, camera 1, SRAM 1, bottom Half
+    long TCcaptureSRAM10 = 0x1F7F150001FFF; // Telecommand 21, camera 1, SRAM 1, Top Half
+    long TCcaptureSRAM11 = 0x1F7F151001FFF; // Telecommand 21, camera 1, SRAM 1, bottom Half
     // long captureSRAM11 = 0x1F7F210101FFF; // Telecommand 21, camera 1, SRAM 2, Top Half Reserved for ADCS
-    long captureSRAM21 = 0x1F7F211101FFF; // Telecommand 21, camera 1, SRAM 2, Bottom Half
-    long resultSRAM10 = 0x1F7F210F0FF; // telemetry, camera,  
-    int resultsCubeSense;
-
-    //Binary operators, |, Bitwise, <<1, 1>> 
+    long TCcaptureSRAM21 = 0x1F7F151101FFF; // Telecommand 21, camera 1, SRAM 2, Bottom Half
+    long TLcapatureStatus = 0x1F7F941FFF; // telemetry 20, sensor 1,  
+    
 
     struct AMessage{
         char RxMessage
@@ -52,26 +62,23 @@ void captureTask(void *superresolution ){
 
     while(1){
         if (superresolution == 1){
-            //send capture image telecommand 21 to camera
-            //Checks if image was successfully captured
-            //Check of camera is ready 
-            //Send capture image telecommand 3 times
-                //sort image into SRAM
-
+            captureLocation(long &captureSRAM10);
+            captureLocation(long *captureSRAM11);
+            captureLocation(long *captureSRAM21);
         }
         else{
 
             if(SRAM1Top){
-                captureLocation(long *captureSRAM10)
+                captureLocation(long *captureSRAM10);
             }
             else if(SRAM1Bottom){
-                captureLocation(long *captureSRAM11)
+                captureLocation(long *captureSRAM11);
             }
             else if(SRAM2Bottom){
-                captureLocation(long *captureSRAM21)
+                captureLocation(long *captureSRAM21);
             }
             else{
-                //take no photos as all SRAM Slots are considered as good photos
+                break;
             }            
         }
     }
