@@ -90,5 +90,3 @@ Extracts data from file into array. Displays final results. */
 
 }
 
-// 50 Bad light argument files --> average variance ---> low end of the accepted range
-// 50 Bad dark argument files --> average variance ---> high end of the accepted range
