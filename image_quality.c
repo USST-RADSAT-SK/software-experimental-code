@@ -26,6 +26,7 @@
 
 //TODO: Can a determination for variance range between 4000-11000, pass those values
 
+//The only size images that will go to processor will only 64 x 64 bytes
 void variant(unsigned char *image_buffer, long fileLen){
    double sum;
    float X_bar;
