@@ -21,6 +21,8 @@ int SRAM1Top = 0;       //flag to check if SRAM slot is open
 int SRAM1Bottom = 0;    //flag to check if SRAM slot is open
 int SRAM2Bottom = 0;    //flag to check if SRAM slot is open
 
+//TODO: change flag in image prep task
+
 
 void captureLocation(void *SRAMSlot){
     long TLcapatureStatus = 0x1F7F941FFF; // telemetry 20, sensor 1,  
@@ -78,7 +80,7 @@ void captureTask(void *superresolution ){
                 captureLocation(long *captureSRAM21);
             }
             else{
-                break;
+                break; //all photos slots are filled with a good photo
             }            
         }
     }
