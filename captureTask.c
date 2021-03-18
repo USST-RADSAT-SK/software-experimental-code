@@ -14,7 +14,6 @@
 * @return None
 */
 
-//An Error that may come up, Telecommands ID were assumed to be in hex already (i.e. 21 is 0x21)
 
 queue.h;
 int SRAM1Top = 0;       //flag to check if SRAM slot is open
