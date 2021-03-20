@@ -18,7 +18,7 @@
  * @return will return a true (past quality check) or a false (failed quality check)
  */
 
-//TODO: Make a time out feature
+//TODO: Make a time out featured
 
 #include <stdio.h>
 #include <stdlib.h>
