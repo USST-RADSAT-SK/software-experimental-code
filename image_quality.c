@@ -46,6 +46,13 @@ void variant(unsigned char *image_buffer, long fileLen){
 
     variance = sum_x_minus_xbar /(fileLen-1);
 
+    //if variance between range
+    double highest = 11211.87;
+    double lowest = 4897.86;
+    int check = 0;
+    if (lowest <= variance && variance <= highest){
+       check = 1;
+    }
 
 }
 
