@@ -34,26 +34,19 @@ void variant(unsigned char *image_buffer, long fileLen){
    for ( int i = 0; i < fileLen; i ++){
         sum = sum + image_buffer[i];
     }
-    printf("Sum is: %f\n", sum);
 
    X_bar = sum/fileLen;
 
-   printf("xbar is: %f \n",X_bar);
 
     float sum_x_minus_xbar = 0;
 
     for ( int i = 0; i < fileLen; i ++){
         sum_x_minus_xbar = sum_x_minus_xbar + ( pow((image_buffer[i] - X_bar),2));
     }
-    printf("Sum numerator is: %f \n", sum_x_minus_xbar);
 
     variance = sum_x_minus_xbar /(fileLen-1);
 
-    //if variance between range
-    //  its good
-    printf("Variance: %f\n", variance);
-    printf("S.D: %f\n", sqrt(variance));
-    printf("File length is: %d", fileLen);
+
 }
 
 
