@@ -49,18 +49,19 @@ void variant(unsigned char *image_buffer, long fileLen){
     variance = sum_x_minus_xbar /(fileLen-1);
 
     //if variance between range
-    double highest = 10624.23659;
-    double lowest = 4786.397778;
-    //  its good
-    if (lowest <= variance && variance <= highest){
-        printf("Variance: %f (Accepted)\n", variance);
-    }else{
-        printf("Variance: %f (Declined)\n", variance);
-    }
+    double highest = 11211.87;
+    double lowest = 4897.86;
 
-    //printf("Variance: %f\n", variance);
+
+    printf("Variance: %f\n", variance);
     printf("S.D: %f\n", sqrt(variance));
     printf("File length is: %ld", fileLen);
+
+    // check if it is a good picture
+    int check = 0;
+    if (lowest <= variance && variance <= highest){
+        check = 1;}
+
 }
 
 
