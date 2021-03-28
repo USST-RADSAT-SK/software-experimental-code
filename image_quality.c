@@ -20,6 +20,8 @@
 
 //TODO: Make a time out featured
 
+//Cannot edit photos to test photos. it has to be native under or over exposed
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -31,7 +33,9 @@ void variant(unsigned char *image_buffer, long fileLen){
    double sum;
    float X_bar;
    float variance;
-   for ( int i = 0; i < fileLen; i ++){
+
+   int i;
+   for (i = 0; i < fileLen; i ++){
         sum = sum + image_buffer[i];
     }
 
@@ -40,19 +44,21 @@ void variant(unsigned char *image_buffer, long fileLen){
 
     float sum_x_minus_xbar = 0;
 
-    for ( int i = 0; i < fileLen; i ++){
+    for (i = 0; i < fileLen; i ++){
         sum_x_minus_xbar = sum_x_minus_xbar + ( pow((image_buffer[i] - X_bar),2));
     }
 
     variance = sum_x_minus_xbar /(fileLen-1);
 
     //if variance between range
-    double highest = 11211.87;
-    double lowest = 4897.86;
+    double highest = 12000;
+    double lowest = 4000;
     int check = 0;
     if (lowest <= variance && variance <= highest){
        check = 1;
     }
+    printf("%f\n",variance);
+    printf("%d",check);
 
 }
 
