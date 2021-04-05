@@ -1,12 +1,7 @@
 #include "encrypt.h"
 
-
-#define BUF_LEN_STEP_SIZE 16
-
-
 int getPaddedBufSize(int plaintextLen);
 void padBuffer(uint8_t* buff, uint8_t* paddedBuff, int buffLen, int newBuffLen);
-int getAcsiiOffestFromInt(int number);
 int encrypt(uint8_t* plaintext, int plaintextLen);
 
 
@@ -19,13 +14,13 @@ int encrypt(uint8_t* plaintext, int plaintextLen);
  */
 int getPaddedBufSize(int plaintextLen){
     // Special case for when the buffer size is already a multiple of 16:
-    if (plaintextLen % BUF_LEN_STEP_SIZE == 0){
-	int padLength = plaintextLen + BUF_LEN_STEP_SIZE;
-        return padLength; //If no padding is to be added, pad with 16 bytes
+    if (plaintextLen % MODULUS == 0){
+	int newBufSize = plaintextLen + MODULUS;
+        return newBufSize; //If no padding is to be added, pad with 16 bytes
     }
     else{
     	int newBufSize = plaintextLen +
-        (BUF_LEN_STEP_SIZE - (plaintextLen % BUF_LEN_STEP_SIZE));
+        (MODULUS - (plaintextLen % MODULUS));
     	return newBufSize;
     }
 }
@@ -41,19 +36,12 @@ int getPaddedBufSize(int plaintextLen){
  * @return Null
  */
 void padBuffer(uint8_t* buff, uint8_t* paddedBuff, int buffLen, int newBuffLen){
-    int paddingSize = newBuffLen - buffLen;
-    int i;
-	for (i = 0; i < newBuffLen; i++){
-        if (i < buffLen){
-           paddedBuff[i] = buff[i];
-       }
-        // PKCS padding standard - pad the message with the amount of bytes that
-        // need to be padded - add 48 to convert to ascii for string printing
-        else{
-           paddedBuff[i] = paddingSize;
-        }
+	int paddingSize = newBuffLen - buffLen;
+	memset(paddedBuff, 0, newBuffLen);
+	for (int i=0; i<buffLen; i++){
+		paddedBuff[i] = buff[i];
 	}
-    paddedBuff[newBuffLen] = '\0';
+	pkcs7_padding_pad_buffer(paddedBuff, buffLen, newBuffLen, MODULUS);
 }
 
 /**

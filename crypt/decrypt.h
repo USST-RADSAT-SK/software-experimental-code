@@ -2,7 +2,7 @@
 #define DECRYPT_H_
 #include "crypt_globals.h"
 
-int decrypt(uint8_t* plaintext, int plaintextLen);
+size_t decrypt(uint8_t* plaintext, int plaintextLen);
 
 
 #endif

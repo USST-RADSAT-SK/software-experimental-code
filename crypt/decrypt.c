@@ -1,29 +1,21 @@
 #include "decrypt.h"
 
 
-#define BUF_LEN_STEP_SIZE 16
-
-
-
-int decrypt(uint8_t* ciphertext, int ciphertextlen);
-void depadBuffer(uint8_t* decryptedText, int decryptedtextlen);
+size_t decrypt(uint8_t* ciphertext, int ciphertextlen);
 
 /**
  * @brief Encrypts a buffer in with an AES CBC cipher
  * @header "comms-processing/crypt/encrypt.h"
  * @param plaintext - plaintext value to be decrypt
  * @param plaintextLen - The length of the plaintext value
- * @return Null
+ * @return The actual size of the data
  */
-int decrypt(uint8_t* ciphertext, int ciphertextlen){
-    struct AES_ctx ctx;
-    AES_init_ctx_iv(&ctx, key, iv);
-    AES_CBC_decrypt_buffer(&ctx, ciphertext, ciphertextlen);
-    depadBuffer(ciphertext, ciphertextlen);
+size_t decrypt(uint8_t* ciphertext, int ciphertextlen){
+	struct AES_ctx ctx;
+	AES_init_ctx_iv(&ctx, key, iv);
+	AES_ctx_set_iv(&ctx,iv);
+	AES_CBC_decrypt_buffer(&ctx, ciphertext, ciphertextlen);
+	size_t actualDataLength = pkcs7_padding_data_length(ciphertext, ciphertextlen, MODULUS);
+	return actualDataLength;
 }
 
-void depadBuffer(uint8_t* decryptedText, int decryptedtextlen){
-    int padLength = decryptedText[decryptedtextlen - 1];
-    printf("paddingLength: %d\n", padLength);
-    decryptedText[decryptedtextlen - padLength] = '\0';
-}
