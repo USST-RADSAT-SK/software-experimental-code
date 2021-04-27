@@ -1,7 +1,7 @@
 .PHONY: test clean
 
-ENCRYPT = encrypt.c crypt_globals.c pkcs7_padding.c
-DECRYPT = decrypt.c encrypt.c crypt_globals.c pkcs7_padding.c
+ENCRYPT = encrypt.c crypt_globals.c tiny-aes/pkcs7_padding.c
+DECRYPT = decrypt.c encrypt.c crypt_globals.c tiny-aes/pkcs7_padding.c
 FLAGS = -g aes.a -o
 
 test:
