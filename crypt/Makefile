@@ -1,12 +1,10 @@
 .PHONY: test clean
 
-ENCRYPT = encrypt.c crypt_globals.c pkcs7_padding.c
-DECRYPT = decrypt.c encrypt.c crypt_globals.c pkcs7_padding.c
-FLAGS = -g aes.a -o
+CRYPT = RAes.c -Itiny-aes tiny-aes/pkcs7Padding.c tiny-aes/aes.c
 
 test:
-	gcc test_encrypt.c $(DECRYPT) $(FLAGS) test_encrypt
+	gcc test_crypt.c $(CRYPT) -o test_crypt
 
 
 clean:
-	rm -f test_encrypt
+	rm -f test_crypt encryptedText.txt
