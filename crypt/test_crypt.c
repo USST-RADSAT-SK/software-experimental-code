@@ -218,7 +218,7 @@ int testEncryptWriteToFile(){
 	FILE *fPtr2 = fopen("encryptedText.txt", "r");
 	uint8_t* textFromFile = (uint8_t*)malloc(newMsgLen * sizeof(uint8_t));
 	for (int i=0; i<newMsgLen; i++){
-		textFromFile[i] = fgetc(fPtr);
+		textFromFile[i] = fgetc(fPtr2);
 	}
 	printBuffer("Message taken from file: ", textFromFile, newMsgLen);
 	size_t actualMessageSize = aesDecrypt(textFromFile, newMsgLen, iv);
